@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def load_data(file_path):
     data = []
     with open(file_path) as fp:
@@ -34,11 +37,16 @@ def correct_corrupted_instruction_data(data):
             copy[i][0] = 'nop'
         elif copy[i][0] == 'nop':
             copy[i][0] = 'jmp'
+        elif copy[i][0] == 'acc':
+            continue
         acc, result = find_acc_value_at_infinite_loop(copy)
         if not result:
+            print(i)
             break
     return acc
 
 
 print(find_acc_value_at_infinite_loop(load_data('problem8_data.txt'))[0])
+time = datetime.now()
 print(correct_corrupted_instruction_data(load_data('problem8_data.txt')))
+print(datetime.now() - time)

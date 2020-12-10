@@ -23,11 +23,12 @@ def find_three_sum(nums: List, value: int) -> tuple:
             return (num,) + result
 
 
-with open('problem1_data.txt') as fp:
-    data = []
-    for line in fp.readlines():
-        data.append(int(line))
-    x, y = find_two_sum(data, 2020)
-    print(x * y)
-    x, y, z = find_three_sum(data, 2020)
-    print(x * y * z)
+if __name__ == "__main__":
+    with open('problem1_data.txt') as fp:
+        data = []
+        for line in fp.readlines():
+            data.append(int(line))
+        x, y = find_two_sum(data, 2020)
+        print(x * y)
+        x, y, z = find_three_sum(data, 2020)
+        print(x * y * z)

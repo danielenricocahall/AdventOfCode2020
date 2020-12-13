@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 
 
@@ -27,38 +28,36 @@ def cache(func):
     cached = dict()
 
     def inner(data: list, n: int):
-        if (tuple(data), n) not in cached:
-            cached[(tuple(data), n)] = func(data, n)
-        return cached[(tuple(data), n)]
-
+        data = tuple(data)
+        if data not in cached:
+            cached[data] = defaultdict()
+        if n not in cached[data]:
+            cached[data][n] = func(data, n)
+        return cached[data][n]
+    inner.cache = cached
     return inner
 
 
 def find_combinations(data):
     data = sorted(data)
-    results = set()
 
     @cache
     def helper(data: list, n: int):
-        results.add(tuple(data))
         if n + 1 > len(data) - 1:
             return 1
         elif n + 4 < len(data) - 1 and data[n + 4] - data[n] == 4:
-            copy = data.copy()
+            copy = [*data]
             del copy[n+1]
-            copy2 = data.copy()
+            copy2 = [*data]
             del copy2[n+2]
-            copy7 = data.copy()
+            copy7 = [*data]
             del copy7[n+3]
-            copy3 = data.copy()
-            copy3.remove(data[n + 1])
-            copy3.remove(data[n + 2])
-            copy5 = data.copy()
-            copy5.remove(data[n + 1])
-            copy5.remove(data[n + 3])
-            copy6 = data.copy()
-            copy6.remove(data[n + 2])
-            copy6.remove(data[n + 3])
+            copy3 = [*data]
+            del copy3[n+1:n+3]
+            copy5 = [*data]
+            del copy5[n+1:n+4:2]
+            copy6 = [*data]
+            del copy6[n+2:n+4]
             # 7
             return helper(copy, n) + \
                    helper(copy2, n) + \
@@ -70,15 +69,14 @@ def find_combinations(data):
         elif n + 3 < len(data) - 1 and data[n + 3] - data[n] == 3:
             copy = [*data]
             del copy[n+1]
-            copy2 = data.copy()
+            copy2 = [*data]
             del copy2[n+2]
-            copy3 = data.copy()
-            del copy3[n+1]
-            copy3.remove(data[n + 2])
+            copy3 = [*data]
+            del copy3[n+1:n+3]
             # 4
             return helper(copy, n) + helper(copy2, n) + helper(copy3, n) + helper(data, n + 1)
         elif n + 2 < len(data) - 1 and data[n + 2] - data[n] == 2:
-            copy = data.copy()
+            copy = [*data]
             del copy[n+1]
             # 2
             return helper(copy, n) + helper(data, n + 1)
@@ -86,12 +84,12 @@ def find_combinations(data):
             return helper(data, n + 1)
 
     helper(data, 0)
-    return len(results)
+    return len(helper.cache.keys())
 
 
 if __name__ == "__main__":
     # problem 1
-    data = read_data('problem10_data.txt')
+    data = read_data('problem10_testdata.txt')
     adjacent_diff = compute_joltage_differences(data)
     print(multiply_joltage_diffs(adjacent_diff))
     now = datetime.now()

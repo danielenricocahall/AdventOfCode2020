@@ -3,13 +3,18 @@
 def read_data(file_path):
     mem = dict()
     with open(file_path) as fp:
-        mask = fp.readline().strip().split(' = ')[1]
+        line = fp.readline().strip()
+        mask = line.split(' = ')[1]
         for line in fp.readlines():
-            s, val = line.split(" = ")
-            s = int(s[s.find('[') + 1:s.find(']')])
-            val = int(val.strip())
-            mem[s] = '{0:036b}'.format(val)
-    return mask, mem
+            if 'mask' not in line:
+                s, val = line.split(" = ")
+                s = int(s[s.find('[') + 1:s.find(']')])
+                val = int(val.strip())
+                mem[s] = '{0:036b}'.format(val)
+            else:
+                yield mask, mem
+                mask = line.strip().split(' = ')[1]
+        yield mask, mem
 
 
 def apply_mask(mask: str, mem: dict):
@@ -23,8 +28,7 @@ def compute_sum(mem: dict):
 
 if __name__ == "__main__":
 
-    mask, mem = read_data('problem14_data.txt')
-    print(mask)
-    print(mem)
-    apply_mask(mask, mem)
+    for mask, mem in read_data('problem14_testdata.txt'):
+        apply_mask(mask, mem)
+        print(compute_sum(mem))
     print(compute_sum(mem))
